@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sayyeed.com.notesbackend.dto.notes.NoteInfoDTO;
 import sayyeed.com.notesbackend.dto.notes.NoteRequestDTO;
+import sayyeed.com.notesbackend.dto.notes.NoteUpdateDTO;
+import sayyeed.com.notesbackend.repositories.notes.NotesRepository;
 import sayyeed.com.notesbackend.service.NotesService;
 
 import java.util.List;
@@ -30,5 +32,18 @@ public class NoteController {
     @GetMapping("/{noteId}")
     public ResponseEntity<NoteInfoDTO> getNoteById(@PathVariable(name = "noteId") String noteId) {
         return ResponseEntity.ok(service.getNoteById(noteId));
+    }
+
+    @PutMapping("/{noteId}")
+    public ResponseEntity<NoteInfoDTO> update(
+            @RequestBody NoteRequestDTO dto,
+            @PathVariable(name = "noteId") String noteId
+    ) {
+        return ResponseEntity.ok(service.update(noteId, dto));
+    }
+
+    @DeleteMapping("/{noteId}")
+    public ResponseEntity<String> delete(@PathVariable(name = "noteId") String noteId) {
+        return ResponseEntity.ok(service.delete(noteId));
     }
 }

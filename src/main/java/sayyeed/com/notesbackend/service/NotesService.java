@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sayyeed.com.notesbackend.dto.notes.NoteInfoDTO;
 import sayyeed.com.notesbackend.dto.notes.NoteRequestDTO;
+import sayyeed.com.notesbackend.dto.notes.NoteUpdateDTO;
 import sayyeed.com.notesbackend.dto.user.UserResponseDTO;
 import sayyeed.com.notesbackend.entity.notes.NoteEntity;
 import sayyeed.com.notesbackend.entity.users.UserEntity;
@@ -47,15 +48,32 @@ public class NotesService {
     }
 
     public NoteInfoDTO getNoteById(String noteId) {
-        Optional<NoteEntity> noteEntityOptional = repository.getNoteById(noteId);
+        Optional<NoteEntity> noteEntityOptional = repository.getNoteByIdAndUserId(noteId, SpringSecurityUtil.currentProfileId());
         if (noteEntityOptional.isEmpty()) {
             throw new AppBadException("Note not found");
         }
         NoteEntity entity = noteEntityOptional.get();
-        if (!entity.getUserId().equals(SpringSecurityUtil.currentProfileId())) {
+        return toDTO(entity);
+    }
+
+    public NoteInfoDTO update(String id, NoteRequestDTO dto) {
+        Optional<NoteEntity> noteEntityOptional = repository.getNoteByIdAndUserId(id, SpringSecurityUtil.currentProfileId());
+        if (noteEntityOptional.isEmpty()) {
             throw new AppBadException("Note not found");
         }
+        NoteEntity entity = noteEntityOptional.get();
+        entity.setTitle(dto.getTitle());
+        entity.setDescription(dto.getDescription());
+        repository.save(entity);
         return toDTO(entity);
+    }
+
+    public String delete(String id) {
+        int flag = repository.deleteByIdAndUserId(id, SpringSecurityUtil.currentProfileId());
+        if (flag == 0) {
+            throw new AppBadException("Note not found");
+        }
+        return "Successfully deleted";
     }
 
     private NoteInfoDTO toDTO(NoteEntity entity) {
