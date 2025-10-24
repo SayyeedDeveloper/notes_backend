@@ -22,4 +22,13 @@ public class NoteController {
         return ResponseEntity.ok(service.create(dto));
     }
 
+    @GetMapping("")
+    public ResponseEntity<List<NoteInfoDTO>> getAllNotes() {
+        return ResponseEntity.ok(service.getAllNotes());
+    }
+
+    @GetMapping("/{noteId}")
+    public ResponseEntity<NoteInfoDTO> getNoteById(@PathVariable(name = "noteId") String noteId) {
+        return ResponseEntity.ok(service.getNoteById(noteId));
+    }
 }

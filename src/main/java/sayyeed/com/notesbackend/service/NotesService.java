@@ -4,17 +4,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sayyeed.com.notesbackend.dto.notes.NoteInfoDTO;
 import sayyeed.com.notesbackend.dto.notes.NoteRequestDTO;
+import sayyeed.com.notesbackend.dto.user.UserResponseDTO;
 import sayyeed.com.notesbackend.entity.notes.NoteEntity;
+import sayyeed.com.notesbackend.entity.users.UserEntity;
+import sayyeed.com.notesbackend.exceptions.AppBadException;
 import sayyeed.com.notesbackend.repositories.notes.NotesRepository;
+import sayyeed.com.notesbackend.service.user.UserService;
 import sayyeed.com.notesbackend.utils.SpringSecurityUtil;
 
 import java.time.LocalDateTime;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class NotesService {
 
     @Autowired
     private NotesRepository repository;
+
+    @Autowired
+    private UserService userService;
 
     public NoteInfoDTO create(NoteRequestDTO dto) {
         NoteEntity entity = new NoteEntity();
@@ -26,8 +36,31 @@ public class NotesService {
         return toDTO(entity);
     }
 
+    public List<NoteInfoDTO> getAllNotes() {
+        UserResponseDTO userResponseDTO = userService.getUserInfo();
+        Iterable<NoteEntity> iterable = repository.getAllNotesByUserId(SpringSecurityUtil.currentProfileId());
+
+        List<NoteInfoDTO> responseList = new LinkedList<>();
+        iterable.forEach( map -> responseList.add(toDTO(map)));
+
+        return responseList;
+    }
+
+    public NoteInfoDTO getNoteById(String noteId) {
+        Optional<NoteEntity> noteEntityOptional = repository.getNoteById(noteId);
+        if (noteEntityOptional.isEmpty()) {
+            throw new AppBadException("Note not found");
+        }
+        NoteEntity entity = noteEntityOptional.get();
+        if (!entity.getUserId().equals(SpringSecurityUtil.currentProfileId())) {
+            throw new AppBadException("Note not found");
+        }
+        return toDTO(entity);
+    }
+
     private NoteInfoDTO toDTO(NoteEntity entity) {
         NoteInfoDTO infoDTO = new NoteInfoDTO();
+        infoDTO.setId(entity.getId());
         infoDTO.setTitle(entity.getTitle());
         infoDTO.setDescription(entity.getDescription());
         return infoDTO;
