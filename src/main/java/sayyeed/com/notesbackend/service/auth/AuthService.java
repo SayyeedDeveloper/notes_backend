@@ -1,14 +1,18 @@
 package sayyeed.com.notesbackend.service.auth;
 
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import sayyeed.com.notesbackend.dto.RegisterDTO;
+import sayyeed.com.notesbackend.dto.auth.LoginDTO;
+import sayyeed.com.notesbackend.dto.auth.LoginResponseDTO;
+import sayyeed.com.notesbackend.dto.auth.RegisterDTO;
 import sayyeed.com.notesbackend.entity.users.UserEntity;
 import sayyeed.com.notesbackend.enums.UserRoleEnum;
 import sayyeed.com.notesbackend.exceptions.AppBadException;
 import sayyeed.com.notesbackend.repositories.user.UserRepository;
 import sayyeed.com.notesbackend.service.user.UserRoleService;
+import sayyeed.com.notesbackend.utils.JwtUtil;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -50,6 +54,28 @@ public class AuthService {
         userRoleService.create(entity.getId(), UserRoleEnum.ROLE_USER);
 
         return "Successfully registered";
+    }
+
+    public LoginResponseDTO login(LoginDTO dto) {
+
+        // checking user
+        Optional<UserEntity> userEntityOptional = repository.findByEmail(dto.getEmail());
+        if (userEntityOptional.isEmpty()) {
+            throw new AppBadException("Email or password wrong");
+        }
+
+        UserEntity entity = userEntityOptional.get();
+
+        // checking password
+        boolean flag = bCryptPasswordEncoder.matches(dto.getPassword(), entity.getPassword());
+
+        if (!flag) {
+            throw new AppBadException("Email or password wrong");
+        }
+
+        LoginResponseDTO responseDTO = new LoginResponseDTO();
+        responseDTO.setToken(JwtUtil.encode(entity.getEmail(), userRoleService.getRolesById(entity.getId())));
+        return responseDTO;
     }
 
 }
