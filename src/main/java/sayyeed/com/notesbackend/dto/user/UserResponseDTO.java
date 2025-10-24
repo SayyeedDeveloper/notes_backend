@@ -14,5 +14,5 @@ public class UserResponseDTO {
     private String name;
     private String email;
     private String occupation;
-    private LocalDate birthday;
+    private String birthday;
 }
