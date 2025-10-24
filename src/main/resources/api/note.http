@@ -1,0 +1,32 @@
+### Create note
+POST localhost:8080/api/v1/notes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Test Note",
+  "description": "Notion"
+}
+
+### Get all notes by user
+GET localhost:8080/api/v1/notes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+### Get Note by Id
+GET localhost:8080/api/v1/notes/cd291ae6-9764-46d7-b9b5-9aa9e6a454af
+Authorization: Bearer {{token}}
+
+### Get Note by Id
+PUT localhost:8080/api/v1/notes/cd291ae6-9764-46d7-b9b5-9aa9e6a454af
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Second note",
+  "description": "NOTIoN"
+}
+
+### Delete by Note Id
+DELETE localhost:8080/api/v1/notes/cd291ae6-9764-46d7-b9b5-9aa9e6a454af
+Authorization: Bearer {{token}}
