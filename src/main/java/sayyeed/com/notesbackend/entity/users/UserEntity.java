@@ -3,6 +3,7 @@ package sayyeed.com.notesbackend.entity.users;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import sayyeed.com.notesbackend.entity.notes.NoteEntity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -38,4 +39,7 @@ public class UserEntity {
 
     @Column
     private LocalDateTime createdDate;
+
+    @OneToMany(mappedBy = "user")
+    private List<NoteEntity> notes;
 }
