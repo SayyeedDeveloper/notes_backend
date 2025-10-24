@@ -32,7 +32,7 @@ public class SpringSecurityConfig {
     }
 
     public static String[] openApiList = {
-            "/api/v1/**"
+            "/api/v1/auth/**"
     };
 
 
