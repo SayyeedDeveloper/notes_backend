@@ -5,8 +5,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import sayyeed.com.notesbackend.dto.RegisterDTO;
 import sayyeed.com.notesbackend.entity.users.UserEntity;
+import sayyeed.com.notesbackend.enums.UserRoleEnum;
 import sayyeed.com.notesbackend.exceptions.AppBadException;
-import sayyeed.com.notesbackend.repositories.UserRepository;
+import sayyeed.com.notesbackend.repositories.user.UserRepository;
+import sayyeed.com.notesbackend.service.user.UserRoleService;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -19,6 +21,8 @@ public class AuthService {
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Autowired
+    private UserRoleService userRoleService;
 
     public String register(RegisterDTO dto) {
 
@@ -41,6 +45,10 @@ public class AuthService {
         entity.setPassword(bCryptPasswordEncoder.encode(dto.getPassword()));
         entity.setCreatedDate(LocalDateTime.now());
         repository.save(entity);
+
+        // setting user role
+        userRoleService.create(entity.getId(), UserRoleEnum.ROLE_USER);
+
         return "Successfully registered";
     }
 
